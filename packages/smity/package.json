@@ -1,0 +1,70 @@
+{
+  "name": "smity",
+  "productName": "smity",
+  "version": "1.0.0",
+  "description": "Smity Electron application description",
+  "main": "src/index.js",
+  "scripts": {
+    "cp": "cp -R ../hoppscotch-app/dist public/",
+    "start": "electron-forge start",
+    "package": "electron-forge package ",
+    "make-linux": "electron-forge make --platform linux",
+    "make-mac": "electron-forge make --platform darwin",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "echo \"No linting configured\""
+  },
+  "keywords": [],
+  "author": {
+    "name": "Suraj Sudhera",
+    "email": "suraj.sudhera@gmail.com"
+  },
+  "license": "MIT",
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "asar": true,
+        "appId": "com.smity.electron",
+        "appCategoryType": "public.app-category.developer-tools"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel"
+        },
+        {
+          "name": "@electron-forge/maker-zip"
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-wix",
+          "config": {
+            "language": 1033,
+            "manufacturer": "My Awesome Company"
+          }
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "@electron-forge/maker-wix": "^6.0.0-beta.65",
+    "electron-settings": "^4.0.2",
+    "electron-squirrel-startup": "^1.0.0",
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.65",
+    "@electron-forge/maker-deb": "^6.0.0-beta.65",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.65",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.65",
+    "@electron-forge/maker-zip": "^6.0.0-beta.65",
+    "electron": "20.1.0",
+    "electron-builder": "^23.3.3"
+  }
+}
