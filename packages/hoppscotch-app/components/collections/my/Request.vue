@@ -360,7 +360,8 @@ const selectRequest = () => {
         confirmChange.value = true
       }
     } else {
-      setRESTSaveContext(null)
+      // don't deselect if you click on the same request
+      // setRESTSaveContext(null)
     }
   }
 }
