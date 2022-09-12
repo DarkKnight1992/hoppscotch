@@ -22,6 +22,14 @@ type RESTSession = {
   response: HoppRESTResponse | null
   testResults: HoppTestResult | null
   saveContext: HoppRequestSaveContext | null
+  windows: HoppRESTRequest[]
+  contexts: HoppRequestSaveContext[]
+  responses: HoppRESTResponse[]
+}
+
+type SetRESTRequest = {
+  req: HoppRESTRequest
+  context?: HoppRequestSaveContext | null
 }
 
 export const getDefaultRESTRequest = (): HoppRESTRequest => ({
@@ -48,12 +56,38 @@ const defaultRESTSession: RESTSession = {
   response: null,
   testResults: null,
   saveContext: null,
+  windows: [],
+  contexts: [],
+  responses: [],
+}
+
+const handleMutiple = {
+  id(context: HoppRequestSaveContext | null | undefined): string {
+    if (context) {
+      if (context.originLocation === "user-collection") {
+        return `${context?.originLocation}_${context.folderPath}_${context.requestIndex}`
+      } else {
+        return `${context?.originLocation}_${context.teamID}_${context.collectionID}_${context.requestID}`
+      }
+    }
+    return new Date().getTime().toString()
+  },
+  add(session: RESTSession, payload: SetRESTRequest): HoppRESTRequest[] {
+    const id = this.id(payload.context)
+    const requests = session.windows
+    const existingRequest = requests.findIndex((req) => req.id === id)
+    if (existingRequest === -1) {
+      return [...requests, { ...payload.req, id }]
+    }
+    return requests
+  },
 }
 
 const dispatchers = defineDispatchers({
-  setRequest(_: RESTSession, { req }: { req: HoppRESTRequest }) {
+  setRequest(curr: RESTSession, payload: SetRESTRequest) {
     return {
-      request: req,
+      request: payload.req,
+      windows: handleMutiple.add(curr, payload),
     }
   },
   setRequestName(curr: RESTSession, { newName }: { newName: string }) {
@@ -324,6 +358,7 @@ export function setRESTRequest(
     dispatcher: "setRequest",
     payload: {
       req,
+      context: saveContext,
     },
   })
 
