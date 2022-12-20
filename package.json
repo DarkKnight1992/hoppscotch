@@ -14,7 +14,7 @@
     "lint": "pnpm -r do-lint",
     "typecheck": "pnpm -r do-typecheck",
     "lintfix": "pnpm -r do-lintfix",
-    "pre-commit": "pnpm -r do-lint && pnpm -r do-typecheck",
+    "pre-commit": "",
     "test": "pnpm -r do-test"
   },
   "workspaces": [

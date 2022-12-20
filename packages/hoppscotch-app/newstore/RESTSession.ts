@@ -17,14 +17,19 @@ import { HoppTestResult } from "~/helpers/types/HoppTestResult"
 import { HoppRequestSaveContext } from "~/helpers/types/HoppRequestSaveContext"
 import { applyBodyTransition } from "~/helpers/rules/BodyTransition"
 
+type RESTSessionWindow = {
+  id: string
+  request?: HoppRESTRequest
+  context?: HoppRequestSaveContext
+  response?: HoppRESTResponse
+}
+
 type RESTSession = {
   request: HoppRESTRequest
   response: HoppRESTResponse | null
   testResults: HoppTestResult | null
   saveContext: HoppRequestSaveContext | null
-  windows: HoppRESTRequest[]
-  contexts: HoppRequestSaveContext[]
-  responses: HoppRESTResponse[]
+  windows: RESTSessionWindow[]
 }
 
 type SetRESTRequest = {
@@ -57,11 +62,9 @@ const defaultRESTSession: RESTSession = {
   testResults: null,
   saveContext: null,
   windows: [],
-  contexts: [],
-  responses: [],
 }
 
-const handleMutiple = {
+const handleWindows = {
   id(context: HoppRequestSaveContext | null | undefined): string {
     if (context) {
       if (context.originLocation === "user-collection") {
@@ -72,12 +75,12 @@ const handleMutiple = {
     }
     return new Date().getTime().toString()
   },
-  add(session: RESTSession, payload: SetRESTRequest): HoppRESTRequest[] {
+  add(session: RESTSession, payload: SetRESTRequest): RESTSessionWindow[] {
     const id = this.id(payload.context)
     const requests = session.windows
     const existingRequest = requests.findIndex((req) => req.id === id)
     if (existingRequest === -1) {
-      return [...requests, { ...payload.req, id }]
+      return [...requests, { request: { ...payload.req }, id }]
     }
     return requests
   },
@@ -87,7 +90,7 @@ const dispatchers = defineDispatchers({
   setRequest(curr: RESTSession, payload: SetRESTRequest) {
     return {
       request: payload.req,
-      windows: handleMutiple.add(curr, payload),
+      windows: handleWindows.add(curr, payload),
     }
   },
   setRequestName(curr: RESTSession, { newName }: { newName: string }) {
@@ -350,6 +353,10 @@ export function getRESTRequest() {
   return restSessionStore.subject$.value.request
 }
 
+export function getRESTWindows() {
+  return restSessionStore.subject$.value.windows
+}
+
 export function setRESTRequest(
   req: HoppRESTRequest,
   saveContext?: HoppRequestSaveContext | null
@@ -609,6 +616,11 @@ export const restSaveContext$ = restSessionStore.subject$.pipe(
 
 export const restRequest$ = restSessionStore.subject$.pipe(
   pluck("request"),
+  distinctUntilChanged()
+)
+
+export const restWindows$ = restSessionStore.subject$.pipe(
+  pluck("windows"),
   distinctUntilChanged()
 )
 

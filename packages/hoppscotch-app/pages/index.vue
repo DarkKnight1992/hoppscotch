@@ -1,6 +1,7 @@
 <template>
   <AppPaneLayout layout-id="http">
     <template #primary>
+      <TabWindow />
       <HttpRequest />
       <HttpRequestOptions />
     </template>
